@@ -7,7 +7,9 @@ int main()
 {
     RenderWindow window(VideoMode(1000, 1000), "CHESS 2");
     Texture chessBoard;
-    chessBoard.loadFromFile("board.jpg");
+    chessBoard.loadFromFile("board.png");
+    Sprite board;
+    board.setTexture(chessBoard);
 
 
     while (window.isOpen())
@@ -20,8 +22,6 @@ int main()
         }
 
         window.clear();
-        Sprite board;
-        board.setTexture(chessBoard);
         window.draw(board);
         window.display();
     }
