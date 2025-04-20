@@ -1,6 +1,7 @@
 #include "Piece.hpp"
 #include "SFML/Graphics.hpp"
 #include <iostream>
+#include <map>
 
 using namespace sf;
 
@@ -11,6 +12,7 @@ struct Coordinates {
 
 class Board {
 public:
+	Board(); // just loading images
 	void RenderBoard(RenderWindow& window); // need to pass reference to our window in source since we aren't creating a new one
 private:
 	/*
@@ -46,5 +48,7 @@ private:
 		{ {125,759}, {229,758}, {337,763}, {439,760}, {547,757}, {661,761}, {764,763}, {859,760} },
 		{ {124,865}, {239,866}, {343,867}, {446,867}, {547,867}, {656,865}, {759,868}, {871,869} }
 	};
+	
+	std::map <int, Texture> piece2Image;
 
 };

@@ -1,7 +1,7 @@
 # PA9122 TODO
 ## Break these into subtasks if need be
 - [X] Display board on screen
-- [ ] Display pieces on screen (we can do this using the board coordinates defined in Class Board)
+- [X] Display pieces on screen (we can do this using the board coordinates defined in Class Board)
 - [ ] Allow pieces to be moved (should snap to nearest tile)
 - [ ] Implement the logic to check where a piece can move (have to do this for every piece)
 - [ ] Detect check, checkmate

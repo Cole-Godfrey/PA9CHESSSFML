@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include "Board.hpp"
+
 
 using namespace sf;
 
@@ -8,8 +10,9 @@ int main()
     RenderWindow window(VideoMode(1000, 1000), "CHESS 2");
     Texture chessBoard;
     chessBoard.loadFromFile("board.png");
-    Sprite board;
-    board.setTexture(chessBoard);
+    Sprite boardImage;
+    boardImage.setTexture(chessBoard);
+    Board actualBoard;
 
 
     while (window.isOpen())
@@ -22,7 +25,8 @@ int main()
         }
 
         window.clear();
-        window.draw(board);
+        window.draw(boardImage);
+        actualBoard.RenderBoard(window);
         window.display();
     }
 
