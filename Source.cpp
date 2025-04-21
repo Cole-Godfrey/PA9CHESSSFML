@@ -1,12 +1,9 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Graphics/Image.hpp>
+#include "SFML/Graphics.hpp"
 #include "Board.hpp"
-
 
 using namespace sf;
 
-int main()
-{
+int main() {
     RenderWindow window(VideoMode(1000, 1000), "CHESS 2");
     Texture chessBoard;
     chessBoard.loadFromFile("board.png");
@@ -14,14 +11,16 @@ int main()
     boardImage.setTexture(chessBoard);
     Board actualBoard;
 
-
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         Event event;
-        while (window.pollEvent(event))
-        {
+        while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
+
+            if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+                Vector2i mousePos = Mouse::getPosition(window);
+                actualBoard.handleClick(mousePos.x, mousePos.y);
+            }
         }
 
         window.clear();

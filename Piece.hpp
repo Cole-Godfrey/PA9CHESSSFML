@@ -1,46 +1,43 @@
+
+#pragma once
 #include <vector>
 
-using namespace std;
-
 struct Pair {
-	int x;
-	int y;
+    int x;
+    int y;
 };
 
 class Piece {
 public:
-	virtual vector<Pair> getAllPossibleMoves(Pair curPos);
-private:
-	int side; // black or white
-	Pair pos;
+    virtual std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]);
 };
 
 class Pawn : public Piece {
 public:
-	vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
 
 class Knight : public Piece {
 public:
-	 vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
 
 class Bishop : public Piece {
 public:
-	 vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
 
 class Rook : public Piece {
 public:
-	vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
 
 class King : public Piece {
 public:
-	vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
 
 class Queen : public Piece {
 public:
-	vector<Pair> getAllPossibleMoves(Pair curPos);
+    std::vector<Pair> getAllPossibleMoves(Pair curPos, int board[8][8]) override;
 };
