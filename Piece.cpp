@@ -6,7 +6,6 @@ bool isInBounds(int x, int y) {
 }
 
 std::vector<Pair> Piece::getAllPossibleMoves(Pair, int[8][8]) {
-    // this is just a test comment to see if i can upload to github repo
     return {};
 }
 
