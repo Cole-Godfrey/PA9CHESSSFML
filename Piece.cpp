@@ -16,8 +16,7 @@ std::vector<Pair> Pawn::getAllPossibleMoves(Pair curPos, int board[8][8]) {
     if (isInBounds(curPos.x, curPos.y + dir) && board[curPos.y + dir][curPos.x] == 0)
         moves.push_back({ curPos.x, curPos.y + dir });
 
-    if (((dir == -1 && curPos.y == 6) || (dir == 1 && curPos.y == 1)) &&
-        board[curPos.y + dir][curPos.x] == 0 &&
+    if (((dir == -1 && curPos.y == 6) || (dir == 1 && curPos.y == 1)) && board[curPos.y + dir][curPos.x] == 0 &&
         board[curPos.y + 2 * dir][curPos.x] == 0)
         moves.push_back({ curPos.x, curPos.y + 2 * dir });
 
@@ -70,7 +69,7 @@ std::vector<Pair> Rook::getAllPossibleMoves(Pair curPos, int board[8][8]) {
     std::vector<Pair> moves;
     int side = (board[curPos.y][curPos.x] > 0) ? 1 : -1;
 
-    for (int dx = -1; dx <= 1; dx += 2)
+    for (int dx = -1; dx <= 1; dx += 2) {
         for (int i = 1; i < 8; ++i) {
             int nx = curPos.x + i * dx;
             if (!isInBounds(nx, curPos.y)) break;
@@ -81,8 +80,9 @@ std::vector<Pair> Rook::getAllPossibleMoves(Pair curPos, int board[8][8]) {
                 break;
             }
         }
+    }
 
-    for (int dy = -1; dy <= 1; dy += 2)
+    for (int dy = -1; dy <= 1; dy += 2) {
         for (int i = 1; i < 8; ++i) {
             int ny = curPos.y + i * dy;
             if (!isInBounds(curPos.x, ny)) break;
@@ -93,11 +93,13 @@ std::vector<Pair> Rook::getAllPossibleMoves(Pair curPos, int board[8][8]) {
                 break;
             }
         }
+    }
 
     return moves;
 }
 
 std::vector<Pair> Queen::getAllPossibleMoves(Pair curPos, int board[8][8]) {
+	// same shit as the bishop and rook combined
     Bishop b;
     Rook r;
     auto moves = b.getAllPossibleMoves(curPos, board);

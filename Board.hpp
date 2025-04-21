@@ -18,9 +18,19 @@ class Board {
 public:
     Board();
     void RenderBoard(RenderWindow& window);
-    void handleClick(int mouseX, int mouseY);
+    void handleClick(int mouseX, int mouseY); // need to pass reference to our window in source since we aren't creating a new one
 
 private:
+    /*
+    black = neg, white pos
+    0 = empty square
+    1 = pawn
+    2 = knight
+    3 = bishop
+    4 = rook
+    5 = king
+    6 = queen
+    */
     int board[8][8] = {
         {-4, -2, -3, -6, -5, -3, -2, -4},
         {-1, -1, -1, -1, -1, -1, -1, -1},

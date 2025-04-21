@@ -2,7 +2,38 @@
 
 using namespace sf;
 
+void Board::RenderBoard(RenderWindow& window) {
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            int piecenum = board[i][j];
+            if (piecenum != 0) {
+                Sprite piece;
+                piece.setTexture(piece2Image[piecenum]);
+                piece.setPosition(boardCords[i][j].x, boardCords[i][j].y);
+                // because it sets the origin to 0,0 (which is top left of sprite) it places the top left corner of the texture
+                // at the pos we want to place it (so it is putting it in bottom right of squares). So we need to manually adjust
+                // origin to middle of texture to have it placed in middle of square
+                piece.setOrigin(piece.getLocalBounds().width / 2, piece.getLocalBounds().height / 2);
+                piece.setScale(1.5, 1.5);
+                window.draw(piece);
+            }
+        }
+    }
+
+    // puprle guide for possible moves for each piece
+    for (auto move : possibleMoves) {
+        RectangleShape highlight(Vector2f(100.f, 100.f)); 
+        highlight.setFillColor(Color(128, 0, 128, 100));  
+        highlight.setOrigin(highlight.getSize().x / 2, highlight.getSize().y / 2);
+        highlight.setPosition(boardCords[move.y][move.x].x, boardCords[move.y][move.x].y);
+        window.draw(highlight);
+    }
+}
+
 Board::Board() {
+    // create the map keys and values while loading images at the same time
+    // also images courtesy of wikipedia
     piece2Image[1].loadFromFile("Chess_plt60.png");
     piece2Image[-1].loadFromFile("Chess_pdt60.png");
     piece2Image[2].loadFromFile("Chess_nlt60.png");
@@ -17,42 +48,28 @@ Board::Board() {
     piece2Image[-6].loadFromFile("Chess_qdt60.png");
 }
 
-void Board::RenderBoard(RenderWindow& window) {
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            int piecenum = board[i][j];
-            if (piecenum != 0) {
-                Sprite piece;
-                piece.setTexture(piece2Image[piecenum]);
-                piece.setPosition(boardCords[i][j].x, boardCords[i][j].y);
-                piece.setOrigin(piece.getLocalBounds().width / 2, piece.getLocalBounds().height / 2);
-                piece.setScale(1.5, 1.5);
-                window.draw(piece);
-            }
-        }
-    }
-
-    for (auto move : possibleMoves) {
-        RectangleShape highlight(Vector2f(100.f, 100.f)); // size of the square
-        highlight.setFillColor(Color(128, 0, 128, 100));  // purple with transparency
-        highlight.setOrigin(highlight.getSize().x / 2, highlight.getSize().y / 2);
-        highlight.setPosition(boardCords[move.y][move.x].x, boardCords[move.y][move.x].y);
-        window.draw(highlight);
-    }
-}
-
 void Board::handleClick(int mouseX, int mouseY) {
+
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
+
             int bx = boardCords[j][i].x;
             int by = boardCords[j][i].y;
+
+           // this checls the coordinates of the mouse cursor if its within a certain square. [0-50] from the origin 
             if (abs(bx - mouseX) < 50 && abs(by - mouseY) < 50) {
+
                 if (!pieceSelected && board[j][i] != 0) {
+
                     selectedX = i;
                     selectedY = j;
                     pieceSelected = true;
+
+                    // what piece is in the square?
                     int type = abs(board[j][i]);
                     Piece* piece = nullptr;
+
+                    
                     switch (type) {
                     case 1: piece = new Pawn(); break;
                     case 2: piece = new Knight(); break;
@@ -61,9 +78,12 @@ void Board::handleClick(int mouseX, int mouseY) {
                     case 5: piece = new King(); break;
                     case 6: piece = new Queen(); break;
                     }
+
                     if (piece)
                         possibleMoves = piece->getAllPossibleMoves({ i, j }, board);
                 }
+
+                // valid move checking. if yes, piece moves to designated quare user wants.
                 else if (pieceSelected) {
                     for (auto move : possibleMoves) {
                         if (move.x == i && move.y == j) {
@@ -72,9 +92,11 @@ void Board::handleClick(int mouseX, int mouseY) {
                             break;
                         }
                     }
-                    pieceSelected = false;
+
+                    pieceSelected = false; // deselcting or selecting outside possible moves will clear out the possible move guide.
                     possibleMoves.clear();
                 }
+
                 return;
             }
         }

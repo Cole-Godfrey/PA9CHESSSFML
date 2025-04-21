@@ -4,6 +4,7 @@
 using namespace sf;
 
 int main() {
+
     RenderWindow window(VideoMode(1000, 1000), "CHESS 2");
     Texture chessBoard;
     chessBoard.loadFromFile("board.png");
