@@ -147,6 +147,24 @@
     <ClInclude Include="Board.hpp" />
     <ClInclude Include="Piece.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="board.png" />
+    <Image Include="Chess_bdt60.png" />
+    <Image Include="Chess_blt60.png" />
+    <Image Include="Chess_kdt60.png" />
+    <Image Include="Chess_klt60.png" />
+    <Image Include="Chess_ndt60.png" />
+    <Image Include="Chess_nlt60.png" />
+    <Image Include="Chess_pdt60.png" />
+    <Image Include="Chess_plt60.png" />
+    <Image Include="Chess_qdt60.png" />
+    <Image Include="Chess_qlt60.png" />
+    <Image Include="Chess_rdt60.png" />
+    <Image Include="Chess_rlt60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

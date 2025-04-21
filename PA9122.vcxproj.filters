@@ -33,4 +33,50 @@
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="board.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_bdt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_blt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_kdt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_klt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_ndt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_nlt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_pdt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_plt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_qdt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_qlt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_rdt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Chess_rlt60.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
