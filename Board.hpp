@@ -19,6 +19,9 @@ public:
     Board();
     void RenderBoard(RenderWindow& window);
     void handleClick(int mouseX, int mouseY); // need to pass reference to our window in source since we aren't creating a new one
+    bool isSquareAttacked(int x, int y, int s);
+    bool check(int s);
+    bool mate(int s);
 
 private:
     /*
@@ -58,4 +61,5 @@ private:
     int selectedX = -1, selectedY = -1;
     bool pieceSelected = false;
     std::vector<Pair> possibleMoves;
+    int turn = 1; // white = 1, black = -1
 };

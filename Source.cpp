@@ -1,4 +1,3 @@
-
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include "Board.hpp"

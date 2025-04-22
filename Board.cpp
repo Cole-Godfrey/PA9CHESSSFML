@@ -89,6 +89,12 @@ void Board::handleClick(int mouseX, int mouseY) {
                         if (move.x == i && move.y == j) {
                             board[j][i] = board[selectedY][selectedX];
                             board[selectedY][selectedX] = 0;
+                            turn *= -1;
+                            if (turn == 1) std::cout << "White turn";
+                            else std::cout << "Black Turn";
+                            bool isCheck = check(turn);
+                            if (isCheck) std::cout << "CHECK";
+                            if (mate(turn)) std::cout << "MAATE";
                             break;
                         }
                     }
@@ -101,4 +107,72 @@ void Board::handleClick(int mouseX, int mouseY) {
             }
         }
     }
+}
+
+bool Board::check(int s) {
+    Piece* piece = nullptr;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            // one of other teams pieces
+            if ((s == -1 && board[i][j] > 0) || s == 1 && board[i][j] < 0) {
+                switch (abs(board[i][j])) {
+                case 1: piece = new Pawn(); break;
+                case 2: piece = new Knight(); break;
+                case 3: piece = new Bishop(); break;
+                case 4: piece = new Rook(); break;
+                case 5: piece = new King(); break;
+                case 6: piece = new Queen(); break;
+                }
+                std::vector<Pair> piecemoves = piece->getAllPossibleMoves({j, i}, board);
+                for (auto move : piecemoves) {
+                    // i just realized that move.x SHOULD go in the second [], but for some reason this works.
+                    // so my guess is that in getallpossible moves, the pair returned is (y, x) not (x, y), even though it says x, y
+                    if ((s == -1 && board[move.y][move.x] == -5) || (s == 1 && board[move.y][move.x] == 5)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool Board::mate(int s) {
+    if (!check(s)) return false;
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            if (board[i][j] * s > 0) { // only looking at our pieces (whoever turn it is)
+                Piece* piece = nullptr;
+                switch (abs(board[i][j])) {
+                case 1: piece = new Pawn(); break;
+                case 2: piece = new Knight(); break;
+                case 3: piece = new Bishop(); break;
+                case 4: piece = new Rook(); break;
+                case 5: piece = new King(); break;
+                case 6: piece = new Queen(); break;
+                }
+                std::vector<Pair> moves = piece->getAllPossibleMoves({ j,i}, board);
+                for (auto move : moves) {
+                    // basically gonna simulate every move to see if it will get us out of check
+                    int temp = board[move.y][move.x];
+                    board[move.y][move.x] = board[i][j];
+                    board[i][j] = 0;
+
+                    if (!check(s)) { // got out of check
+                        // undo bc it wont hit the other undo block if we return now
+                        board[i][j] = board[move.y][move.x];
+                        board[move.y][move.x] = temp;
+                        return false;
+                    }
+
+                    //undo
+                    board[i][j] = board[move.y][move.x];
+                    board[move.y][move.x] = temp;
+                   
+                }
+            }
+        }
+    }
+    return true;
 }
