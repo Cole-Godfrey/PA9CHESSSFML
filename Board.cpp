@@ -59,7 +59,7 @@ void Board::handleClick(int mouseX, int mouseY) {
            // this checls the coordinates of the mouse cursor if its within a certain square. [0-50] from the origin 
             if (abs(bx - mouseX) < 50 && abs(by - mouseY) < 50) {
 
-                if (!pieceSelected && board[j][i] != 0) {
+                if (!pieceSelected && board[j][i] != 0 && (board[j][i] * turn > 0))  {
 
                     selectedX = i;
                     selectedY = j;
@@ -79,14 +79,29 @@ void Board::handleClick(int mouseX, int mouseY) {
                     case 6: piece = new Queen(); break;
                     }
 
-                    if (piece)
+                    if (piece) {
                         possibleMoves = piece->getAllPossibleMoves({ i, j }, board);
+                        // go through all moves, if they do not result in check, then it is legal move.
+                        std::vector<Pair> actualPossibleMoves;
+                        for (auto move : possibleMoves) {
+                            // simulating whether a move results in check
+                            int temp = board[move.y][move.x];
+                            board[move.y][move.x] = board[j][i];
+                            board[j][i] = 0;
+                            if (!check(turn)) actualPossibleMoves.push_back(move);
+                            board[j][i] = board[move.y][move.x];
+                            board[move.y][move.x] = temp;
+                        }
+                        // only allow moves that do not result in check
+                        possibleMoves = actualPossibleMoves;
+                    }
                 }
 
                 // valid move checking. if yes, piece moves to designated quare user wants.
                 else if (pieceSelected) {
                     for (auto move : possibleMoves) {
                         if (move.x == i && move.y == j) {
+
                             board[j][i] = board[selectedY][selectedX];
                             board[selectedY][selectedX] = 0;
                             turn *= -1;
