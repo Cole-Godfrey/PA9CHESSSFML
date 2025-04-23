@@ -121,7 +121,6 @@ void runMainMenu() {
             }
         }
 
-        // Hover effect
         for (int i = 0; i < numOptions; ++i) {
             if (buttons[i].getGlobalBounds().contains(mousePos))
                 buttons[i].setFillColor(sf::Color(80, 80, 80));
