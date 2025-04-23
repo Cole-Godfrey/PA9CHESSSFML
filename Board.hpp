@@ -19,9 +19,10 @@ public:
     Board();
     void RenderBoard(RenderWindow& window);
     void handleClick(int mouseX, int mouseY); // need to pass reference to our window in source since we aren't creating a new one
-    bool isSquareAttacked(int x, int y, int s);
+    //bool isSquareAttacked(int x, int y, int s);
     bool check(int s);
     bool mate(int s);
+    int getTurn() const { return turn; }
 
 private:
     /*

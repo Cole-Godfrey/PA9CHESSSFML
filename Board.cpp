@@ -1,6 +1,9 @@
+
+
 #include "Board.hpp"
 
 using namespace sf;
+
 
 void Board::RenderBoard(RenderWindow& window) {
 
