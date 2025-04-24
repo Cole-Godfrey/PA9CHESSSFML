@@ -108,11 +108,11 @@ void Board::handleClick(int mouseX, int mouseY) {
                             board[j][i] = board[selectedY][selectedX];
                             board[selectedY][selectedX] = 0;
                             turn *= -1;
-                            if (turn == 1) std::cout << "White turn";
-                            else std::cout << "Black Turn";
+                            if (turn == 1) std::cout << "White turn\n";
+                            else std::cout << "Black Turn\n";
                             bool isCheck = check(turn);
-                            if (isCheck) std::cout << "CHECK";
-                            if (mate(turn)) std::cout << "MAATE";
+                            if (isCheck) std::cout << "CHECK\n";
+                            if (mate(turn)) std::cout << "MAATE\n";
                             break;
                         }
                     }
@@ -122,6 +122,88 @@ void Board::handleClick(int mouseX, int mouseY) {
                 }
 
                 return;
+            }
+        }
+    }
+}
+
+// same exact thing as handleclick but we are also sending packet of move to port
+bool Board::handleNetworkClick(int mouseX, int mouseY, TcpSocket& socket) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+
+            int bx = boardCords[j][i].x;
+            int by = boardCords[j][i].y;
+
+            // this checls the coordinates of the mouse cursor if its within a certain square. [0-50] from the origin 
+            if (abs(bx - mouseX) < 50 && abs(by - mouseY) < 50) {
+
+                if (!pieceSelected && board[j][i] != 0 && (board[j][i] * turn > 0)) {
+
+                    selectedX = i;
+                    selectedY = j;
+                    pieceSelected = true;
+
+                    // what piece is in the square?
+                    int type = abs(board[j][i]);
+                    Piece* piece = nullptr;
+
+
+                    switch (type) {
+                    case 1: piece = new Pawn(); break;
+                    case 2: piece = new Knight(); break;
+                    case 3: piece = new Bishop(); break;
+                    case 4: piece = new Rook(); break;
+                    case 5: piece = new King(); break;
+                    case 6: piece = new Queen(); break;
+                    }
+
+                    if (piece) {
+                        possibleMoves = piece->getAllPossibleMoves({ i, j }, board);
+                        // go through all moves, if they do not result in check, then it is legal move.
+                        std::vector<Pair> actualPossibleMoves;
+                        for (auto move : possibleMoves) {
+                            // simulating whether a move results in check
+                            int temp = board[move.y][move.x];
+                            board[move.y][move.x] = board[j][i];
+                            board[j][i] = 0;
+                            if (!check(turn)) actualPossibleMoves.push_back(move);
+                            board[j][i] = board[move.y][move.x];
+                            board[move.y][move.x] = temp;
+                        }
+                        // only allow moves that do not result in check
+                        possibleMoves = actualPossibleMoves;
+                    }
+                }
+
+                // valid move checking. if yes, piece moves to designated quare user wants.
+                else if (pieceSelected) {
+                    for (auto move : possibleMoves) {
+                        if (move.x == i && move.y == j) {
+
+                            board[j][i] = board[selectedY][selectedX];
+                            board[selectedY][selectedX] = 0;
+                            // send to server
+                            Packet p;
+                            p << selectedX << selectedY << i << j;
+                            socket.send(p);
+                            turn *= -1;
+                            if (turn == 1) std::cout << "White turn\n";
+                            else std::cout << "Black Turn\n";
+                            bool isCheck = check(turn);
+                            if (isCheck) std::cout << "CHECK\n";
+                            if (mate(turn)) std::cout << "MAATE\n";
+                            pieceSelected = false; // deselcting or selecting outside possible moves will clear out the possible move guide.
+                            possibleMoves.clear();
+                            return true; // did move
+                        }
+                    }
+
+                    pieceSelected = false; // deselcting or selecting outside possible moves will clear out the possible move guide.
+                    possibleMoves.clear();
+                }
+
+                return false;
             }
         }
     }
@@ -143,8 +225,7 @@ bool Board::check(int s) {
                 }
                 std::vector<Pair> piecemoves = piece->getAllPossibleMoves({j, i}, board);
                 for (auto move : piecemoves) {
-                    // i just realized that move.x SHOULD go in the second [], but for some reason this works.
-                    // so my guess is that in getallpossible moves, the pair returned is (y, x) not (x, y), even though it says x, y
+                    // for every move, if it can capture the king it is check
                     if ((s == -1 && board[move.y][move.x] == -5) || (s == 1 && board[move.y][move.x] == 5)) {
                         return true;
                     }

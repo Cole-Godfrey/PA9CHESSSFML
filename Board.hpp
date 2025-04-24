@@ -4,6 +4,7 @@
 
 #include "Piece.hpp"
 #include "SFML/Graphics.hpp"
+#include "SFML/Network.hpp"
 #include <iostream>
 #include <map>
 
@@ -19,10 +20,25 @@ public:
     Board();
     void RenderBoard(RenderWindow& window);
     void handleClick(int mouseX, int mouseY); // need to pass reference to our window in source since we aren't creating a new one
+    bool handleNetworkClick(int mouseX, int mouseY, TcpSocket& socket); // returns whether or not they actually moved something
+    void flip() { turn *= -1; }; // need this to be able to change turn on other side in networking
     //bool isSquareAttacked(int x, int y, int s);
     bool check(int s);
     bool mate(int s);
-    int getTurn() const { return turn; }
+    int getTurn() const { return turn; };
+    // https://www.geeksforgeeks.org/cpp-return-2d-array-from-function/
+    int (*(getBoard)())[8] { return board;};
+    /* for some reason I can't just do board = arr 
+    * I have to loop through whole array and manually set each element
+    */
+    void setBoard(int b[8][8]) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = b[i][j];
+            }
+        }
+    }
+
 
 private:
     /*

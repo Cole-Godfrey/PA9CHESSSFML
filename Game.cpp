@@ -1,4 +1,3 @@
-
 #include "Game.hpp"
 #include "Board.hpp"
 #include <SFML/Graphics.hpp>
@@ -72,14 +71,15 @@ void runMainMenu() {
     title.setFillColor(sf::Color::Black);
     title.setPosition(250.f, 40.f);
 
-    sf::Text textPlay, textRules, textExit;
-    textPlay.setFont(font); textRules.setFont(font); textExit.setFont(font);
+    sf::Text textPlay, textRules, textExit, textNetwork;
+    textPlay.setFont(font); textRules.setFont(font); textExit.setFont(font); textNetwork.setFont(font);
     textPlay.setString("Play 1v1 on same desktop");
+    textNetwork.setString("Play using sockets");
     textRules.setString("View Rules of the Game");
     textExit.setString("Exit");
 
-    sf::Text* options[] = { &textPlay, &textRules, &textExit };
-    const int numOptions = 3;
+    sf::Text* options[] = { &textPlay, &textNetwork ,&textRules, &textExit};
+    const int numOptions = 4;
 
     sf::RectangleShape buttons[numOptions];
     for (int i = 0; i < numOptions; ++i) {
@@ -110,11 +110,26 @@ void runMainMenu() {
                             runMainMenu();
                             break;
                         case 1:
-                            showRulesWindow();
+                            std::cout << "Host (H) or Join (J)? ";
+                            char c; std::cin >> c;
+                            if (c == 'H' || c == 'h') {
+                                playNetworkHost();
+                            }
+                            else {
+                                std::string ip;
+                                std::cout << "Enter Host IP: ";
+                                std::cin >> ip;
+                                playNetworkJoin(IpAddress(ip));
+                            }
+                            runMainMenu();
                             break;
                         case 2:
+                            showRulesWindow();
+                            break;
+                        case 3:
                             window.close();
                             break;
+                        
                         }
                     }
                 }
@@ -189,5 +204,109 @@ void showRulesWindow() {
             rulesWindow.draw(rule);
         }
         rulesWindow.display();
+    }
+}
+
+// https://www.sfml-dev.org/documentation/2.6.1/classsf_1_1Packet.php#:~:text=Packets%20provide%20a%20safe%20and%20easy%20way%20to,sf%3A%3APacket%20class%20provides%20both%20input%20and%20output%20modes.
+bool send(TcpSocket& sock, int sX, int sY, int dX, int dY) {
+    // group the vars into packet and then send it
+    Packet pack;
+    pack << sX << sY << dX << dY;
+    return (sock.send(pack) == Socket::Done);
+}
+bool receive(TcpSocket& sock, int& sX, int& sY, int& dX, int& dY) {
+    Packet pack;
+    if (sock.receive(pack) != sf::Socket::Done) return false; //
+    pack >> sX >> sY >> dX >> dY;
+    return true;
+}
+void playNetworkHost() {
+    // instead of 2 clients, 1 client is also server, so also has listener
+    TcpListener lis;
+    if (lis.listen(69696) != Socket::Done) {
+        std::cout << "COULD NOT LISTEN\n";
+        return;
+    }
+    TcpSocket sock;
+    if (lis.accept(sock) != Socket::Done) {
+        std::cout << "COULD NOT ACCEPT\n";
+        return;
+    }
+    // i dont actually know if this is needed anymore, i was having issues with it freezing but i added this it still kept freezing, then connected w client and it worked.
+    // prob dont need blocking but it doesnt rlly mattter
+    sock.setBlocking(false);
+    bool ismyturn = true;
+    network(sock, ismyturn);
+}
+void playNetworkJoin(IpAddress hostIp) {
+    TcpSocket sock;
+    sock.connect(hostIp, 69696);
+    sock.setBlocking(false);
+    network(sock, false);
+}
+
+void network(TcpSocket& sock, bool ismyturn) {
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "CHESS 2");
+
+    sf::Texture chessBoard;
+    if (!chessBoard.loadFromFile("board.png")) {
+        std::cerr << "Failed to load board.png\n";
+        return;
+    }
+    sf::Sprite boardImage;
+    boardImage.setTexture(chessBoard);
+
+    Board actualBoard;
+
+    sf::Font font;
+    font.loadFromFile("Roboto.ttf");
+
+    sf::Text turnText;
+    turnText.setFont(font);
+    turnText.setCharacterSize(30);
+    turnText.setFillColor(sf::Color::Black);
+    turnText.setPosition(20.f, 20.f);
+
+    int selectX = -1, selectY = -1;
+    bool pieceSelected = false;
+    std::vector<Pair> moves;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && ismyturn) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                bool didmove = actualBoard.handleNetworkClick(mousePos.x, mousePos.y, sock);
+                if(didmove) ismyturn = false;
+            }
+        }
+        if (!ismyturn) {
+            // to store ref for recieve
+            int sx, sy, dx, dy;
+            if (receive(sock, sx, sy, dx, dy)) {
+                actualBoard.getBoard()[dy][dx] = actualBoard.getBoard()[sy][sx];
+                actualBoard.getBoard()[sy][sx] = 0;
+                actualBoard.flip();
+                ismyturn = true;
+            }
+        }
+
+        if (actualBoard.mate(1)) turnText.setString("Checkmate! Black Wins!");
+        else if (actualBoard.mate(-1)) turnText.setString("Checkmate! White Wins!");
+        else turnText.setString(actualBoard.getTurn() == 1 ? "White's Turn" : "Black's Turn");
+
+        window.clear();
+        window.draw(boardImage);
+        actualBoard.RenderBoard(window);
+        window.draw(turnText);
+        window.display();
+
+        if (actualBoard.mate(1) || actualBoard.mate(-1)) {
+            sf::sleep(sf::seconds(3));
+            window.close();
+        }
     }
 }
