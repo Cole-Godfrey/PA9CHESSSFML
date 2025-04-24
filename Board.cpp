@@ -107,6 +107,11 @@ void Board::handleClick(int mouseX, int mouseY) {
 
                             board[j][i] = board[selectedY][selectedX];
                             board[selectedY][selectedX] = 0;
+                            // Check Pawn Promotion
+                            if (abs(board[j][i]) == 1 && ((board[j][i] == 1 && j == 0) || (board[j][i] == -1 && j == 7))) {
+                                int promoted = showPromotionMenu(board[j][i] > 0);
+                                board[j][i] = (board[j][i] > 0) ? promoted : -promoted;
+                            }
                             turn *= -1;
                             if (turn == 1) std::cout << "White turn\n";
                             else std::cout << "Black Turn\n";
@@ -274,4 +279,83 @@ bool Board::mate(int s) {
         }
     }
     return true;
+}
+
+int Board::showPromotionMenu(bool isWhite) {
+
+    sf::RenderWindow promoWindow(sf::VideoMode(1000, 1000), "Pawn Promotion");
+
+    sf::Font font;
+    if (!font.loadFromFile("Roboto.ttf")) {
+        std::cerr << "Failed to load font.\n";
+        return 6;
+    }
+
+    sf::Text prompt("Choose a piece to promote to:", font, 36);
+    prompt.setFillColor(sf::Color::Black);
+    prompt.setPosition(300.f, 100.f);
+
+    std::vector<int> types = { 6, 4, 3, 2 };  // Queen, Rook, Bishop, Knight
+    std::vector<sf::RectangleShape> buttons;
+    std::vector<sf::Sprite> pieceSprites;
+
+    float squareSize = 180.f;
+    float spacing = 60.f;
+    float startX = (1000 - (2 * squareSize + spacing)) / 2.f;
+    float startY = (1000 - (2 * squareSize + spacing)) / 2.f;
+
+    for (int i = 0; i < 4; ++i) {
+        int pieceID = isWhite ? types[i] : -types[i];
+        if (!piece2Image.count(pieceID)) {
+            std::cerr << "Missing texture for piece ID: " << pieceID << std::endl;
+            continue;
+        }
+
+        sf::RectangleShape button(sf::Vector2f(squareSize, squareSize));
+        float x = startX + (i % 2) * (squareSize + spacing);
+        float y = startY + (i / 2) * (squareSize + spacing);
+        button.setPosition(x, y);
+        button.setFillColor(sf::Color(50, 50, 50));
+        buttons.push_back(button);
+
+        sf::Sprite piece;
+        piece.setTexture(piece2Image[pieceID]);
+        piece.setScale(3.0f, 3.0f);
+        sf::FloatRect bounds = piece.getLocalBounds();
+        piece.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
+        piece.setPosition(x + squareSize / 2.f, y + squareSize / 2.f);
+        pieceSprites.push_back(piece);
+    }
+
+    while (promoWindow.isOpen()) {
+        sf::Event event;
+        while (promoWindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                promoWindow.close();
+                return 6;
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed &&
+                event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mousePos = promoWindow.mapPixelToCoords(sf::Mouse::getPosition(promoWindow));
+                for (int i = 0; i < buttons.size(); ++i) {
+                    if (buttons[i].getGlobalBounds().contains(mousePos)) {
+                        std::cout << "PROMOTING TO: " << types[i] << std::endl;
+                        promoWindow.close();
+                        return types[i];
+                    }
+                }
+            }
+        }
+
+        promoWindow.clear(sf::Color(240, 230, 200));
+        promoWindow.draw(prompt);
+        for (int i = 0; i < buttons.size(); ++i) {
+            promoWindow.draw(buttons[i]);
+            promoWindow.draw(pieceSprites[i]);
+        }
+        promoWindow.display();
+    }
+
+    return 6;
 }

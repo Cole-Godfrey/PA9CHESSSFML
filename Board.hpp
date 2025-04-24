@@ -38,6 +38,7 @@ public:
             }
         }
     }
+    int showPromotionMenu(bool isWhite);
 
 
 private:
