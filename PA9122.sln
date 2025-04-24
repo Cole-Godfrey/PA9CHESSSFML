@@ -20,6 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Chess_rdt60.png = Chess_rdt60.png
 		Chess_rlt60.png = Chess_rlt60.png
 		README.md = README.md
+		x64\Release\sfml-audio-2.dll = x64\Release\sfml-audio-2.dll
+		x64\Release\sfml-graphics-2.dll = x64\Release\sfml-graphics-2.dll
+		x64\Release\sfml-network-2.dll = x64\Release\sfml-network-2.dll
+		x64\Release\sfml-system-2.dll = x64\Release\sfml-system-2.dll
+		x64\Release\sfml-window-2.dll = x64\Release\sfml-window-2.dll
 	EndProjectSection
 EndProject
 Global
