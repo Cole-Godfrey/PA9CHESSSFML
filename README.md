@@ -1,4 +1,4 @@
-# PA9 - Chess in SFML with Sockets
+# PA9 - Chess in SFML with Sockets - BUILD IN RELEASE
 Teammate names - Cole Godfrey, Cal Tatualla
 Lab Section (both) - 5
 Demo + Explanation - https://www.youtube.com/watch?v=82UkIB4_gYk
